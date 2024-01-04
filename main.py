@@ -28,6 +28,8 @@ class Game():
         self.player2 = player2
         self.player2.setIcon("O")
         self.turn_count = 0
+    def computerTurn(self):
+        pass
     def changeState(self, button):
         button['state'] = 'disabled'
 
