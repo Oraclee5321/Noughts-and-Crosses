@@ -1,4 +1,6 @@
 import tkinter as tk
+import random
+import sys
 from tkinter import ttk
 
 class Player():
@@ -28,13 +30,46 @@ class Game():
         self.player2 = player2
         self.player2.setIcon("O")
         self.turn_count = 0
+        self.enabled_buttons = [1,2,3,4,5,6,7,8,9]
+        self.setupBoard()
+
+    def setupBoard(self):
+        self.b1 = ttk.Button(win, text="", command=lambda: self.buttonClick(self.b1))
+        self.b2 = ttk.Button(win, text="", command=lambda: self.buttonClick(self.b2))
+        self.b3 = ttk.Button(win, text="", command=lambda: self.buttonClick(self.b3))
+        self.b4 = ttk.Button(win, text="", command=lambda: self.buttonClick(self.b4))
+        self.b5 = ttk.Button(win, text="", command=lambda: self.buttonClick(self.b5))
+        self.b6 = ttk.Button(win, text="", command=lambda: self.buttonClick(self.b6))
+        self.b7 = ttk.Button(win, text="", command=lambda: self.buttonClick(self.b7))
+        self.b8 = ttk.Button(win, text="", command=lambda: self.buttonClick(self.b8))
+        self.b9 = ttk.Button(win, text="", command=lambda: self.buttonClick(self.b9))
+        self.b1.grid(row=0, column=0)
+        self.b2.grid(row=0, column=1)
+        self.b3.grid(row=0, column=2)
+        self.b4.grid(row=1, column=0)
+        self.b5.grid(row=1, column=1)
+        self.b6.grid(row=1, column=2)
+        self.b7.grid(row=2, column=0)
+        self.b8.grid(row=2, column=1)
+        self.b9.grid(row=2, column=2)
+
+
     def computerTurn(self):
-        pass
+        computer_choice = random.choice(self.enabled_buttons)
+        self.b = getattr(self, "b" + str(computer_choice))
+        self.b.invoke()
+
+
     def changeState(self, button):
         button['state'] = 'disabled'
+        #self.enabled_buttons.remove(int(button._name[-1]))
+        print(self.enabled_buttons)
+
+
 
     def buttonClick(self, button):
         if self.player1.getTurn():
+            self.turn_count += 1
             button.config(text=self.player1.getIcon())
             self.changeState(button)
             self.player1.turn = False
@@ -44,6 +79,7 @@ class Game():
             self.changeState(button)
             self.player1.turn = True
             self.player2.turn = False
+
         self.turn_count += 1
         if self.turn_count == 9:
             print("Tie")
@@ -55,25 +91,27 @@ class Game():
             elif not self.player2.getTurn():
                 if self.checkWin(self.player2):
                     self.endGame(self.player2)
+
     def checkWin(self,player):
-        if b1['text'] == b2['text'] == b3['text'] == player.getIcon():
+        if self.b1['text'] == self.b2['text'] == self.b3['text'] == player.getIcon():
             return(True)
-        elif b4['text'] == b5['text'] == b6['text'] == player.getIcon():
+        elif self.b4['text'] == self.b5['text'] == self.b6['text'] == player.getIcon():
             return(True)
-        elif b7['text'] == b8['text'] == b9['text'] == player.getIcon():
+        elif self.b7['text'] == self.b8['text'] == self.b9['text'] == player.getIcon():
             return(True)
-        elif b1['text'] == b4['text'] == b7['text'] == player.getIcon():
+        elif self.b1['text'] == self.b4['text'] == self.b7['text'] == player.getIcon():
             return(True)
-        elif b2['text'] == b5['text'] == b8['text'] == player.getIcon():
+        elif self.b2['text'] == self.b5['text'] == self.b8['text'] == player.getIcon():
             return(True)
-        elif b3['text'] == b6['text'] == b9['text'] == player.getIcon():
+        elif self.b3['text'] == self.b6['text'] == self.b9['text'] == player.getIcon():
             return(True)
-        elif b1['text'] == b5['text'] == b9['text'] == player.getIcon():
+        elif self.b1['text'] == self.b5['text'] == self.b9['text'] == player.getIcon():
             return(True)
-        elif b3['text'] == b5['text'] == b7['text'] == player.getIcon():
+        elif self.b3['text'] == self.b5['text'] == self.b7['text'] == player.getIcon():
             return(True)
         else:
             return
+        
     def endGame(self,player):
         print("Winner is: ", player.getName())
         self.turn_count = 0
@@ -89,35 +127,13 @@ class Game():
 computer = Player("Computer")
 player = Player("Player")
 
-Game = Game(player, computer)
         
 #create a window
 win = tk.Tk()
-win.title("Python GUI")
+win.title("Noughts and Crosses")
 #open window
 
-b1 = ttk.Button(win, text="", command=lambda: Game.buttonClick(b1))
-b2 = ttk.Button(win, text="", command=lambda: Game.buttonClick(b2))
-b3 = ttk.Button(win, text="", command=lambda: Game.buttonClick(b3))
-
-b4 = ttk.Button(win, text="", command=lambda: Game.buttonClick(b4))
-b5 = ttk.Button(win, text="", command=lambda: Game.buttonClick(b5))
-b6 = ttk.Button(win, text="", command=lambda: Game.buttonClick(b6))
-b7 = ttk.Button(win, text="", command=lambda: Game.buttonClick(b7))
-b8 = ttk.Button(win, text="", command=lambda: Game.buttonClick(b8))
-b9 = ttk.Button(win, text="", command=lambda: Game.buttonClick(b9))
-
-
-
-b1.grid(row=0, column=0)
-b2.grid(row=0, column=1)
-b3.grid(row=0, column=2)
-b4.grid(row=1, column=0)
-b5.grid(row=1, column=1)
-b6.grid(row=1, column=2)
-b7.grid(row=2, column=0)
-b8.grid(row=2, column=1)
-b9.grid(row=2, column=2)
+Game = Game(player, computer)
 
 win.mainloop()
 
