@@ -1,10 +1,12 @@
 import tkinter as tk
 import random
-import sys
+import os
 from tkinter import ttk
+from tkinter import filedialog
 import time
 
-class Player():
+
+class Player():  # Class for players in the game
     def __init__(self, name):
         self.name = name
         self.score = 0
@@ -28,13 +30,14 @@ class Player():
 
     def setIcon(self, icon):
         self.icon = icon
+
     def getScore(self):
         return self.score
 
     def setScore(self, score):
         self.score = score
 
-    def setTie(self,value):
+    def setTie(self, value):
         self.ties = value
 
     def getTie(self):
@@ -42,11 +45,12 @@ class Player():
 
     def setLoss(self, value):
         self.losses = value
+
     def getLoss(self):
         return self.losses
 
 
-class Game():
+class Game():  # Class for the game itself
     def __init__(self):
         self.player1 = None
         self.player2 = None
@@ -60,8 +64,8 @@ class Game():
         print("Deleted")
         root.deiconify()
 
-    def mainMenu(self):
-        self.menu_window = tk.Toplevel()
+    def mainMenu(self): # Main menu of the Game
+        self.menu_window = tk.Toplevel() # Creates new window
         self.iscomputer = tk.IntVar(None, 2)
         self.playing_computer_label = tk.Label(self.menu_window, text="Playing the Computer?")
         self.playing_computer_label.grid(row=0, column=0)
@@ -180,6 +184,7 @@ class Game():
             self.enabled_buttons.remove(int(button._name[-1]))
         except ValueError:
             self.enabled_buttons.remove(1)
+
     def buttonClick(self, button):
         if self.player1.getTurn():
             button.config(text=self.player1.getIcon())
@@ -212,8 +217,6 @@ class Game():
             time.sleep(1)
             self.computerTurn()
 
-
-
     def checkWin(self, player):
         if self.b1['text'] == self.b2['text'] == self.b3['text'] == player.getIcon():
             return True
@@ -244,12 +247,15 @@ class Game():
         return
 
     def displayStats(self):
-        player1_stats = tk.Label(self.game_window, text=self.player1.getName()+"'s Stats:\n Wins:" + str(self.player1.getScore())+"\n Losses: "+str(self.player1.getLoss()))
-        player2_stats = tk.Label(self.game_window, text=self.player2.getName()+"'s Stats:\n Wins:" + str(self.player2.getScore())+"\n Losses: "+str(self.player2.getLoss()))
-        total_ties = tk.Label(self.game_window, text="Total Ties: "+str(self.player1.getTie()))
+        player1_stats = tk.Label(self.game_window, text=self.player1.getName() + "'s Stats:\n Wins:" + str(
+            self.player1.getScore()) + "\n Losses: " + str(self.player1.getLoss()))
+        player2_stats = tk.Label(self.game_window, text=self.player2.getName() + "'s Stats:\n Wins:" + str(
+            self.player2.getScore()) + "\n Losses: " + str(self.player2.getLoss()))
+        total_ties = tk.Label(self.game_window, text="Total Ties: " + str(self.player1.getTie()))
         player1_stats.grid(row=4, column=0, sticky="news")
         player2_stats.grid(row=4, column=1, sticky="news")
         total_ties.grid(row=4, column=2, sticky="news")
+
     def tie(self):
         self.turn_count = 0
         self.userturn.configure(text="Game Tied")
@@ -272,13 +278,77 @@ class Game():
         self.createEndButtons()
         return
 
+class FileOpener():
+
+    def __init__(self):
+        self.files_to_be_modified = []
+        self.modified_files = []
+        self.replaces_done = 0
+        root.withdraw()
+        self.menu = tk.Toplevel()
+        self.menu.geometry("300x300")
+        self.menu.resizable = False,False
+        self.folder_button = tk.Button(self.menu,text="Select Folder", command=lambda: self.folderSelect())
+        self.folder_button.place(relx=0.5, rely=0.3, anchor='center')
+        self.loaded_count = tk.Label(self.menu, text="")
+        self.loaded_count.place(relx=0.5, rely=0.4, anchor='center')
+        self.convert_button = tk.Button(self.menu,text="Convert Files",command=lambda: self.convertFiles())
+        self.replaces_done_count = tk.Label(self.menu, text="")
+        self.replaces_done_count.place(relx=0.5, rely=0.6, anchor='center')
+        self.files_completed = tk.Label(self.menu,text="")
+        self.files_completed.place(relx=0.5, rely=0.7, anchor='center')
+        pass
+    def __del__(self):
+        root.deiconify()
+
+    def folderSelect(self):
+        self.files_to_be_modified = []
+        folder_selected = filedialog.askdirectory()
+        print(folder_selected)
+        list_of_files = os.listdir(folder_selected)
+        for item in list_of_files:
+            if ".txt" in item:
+                item.replace("'","")
+                self.files_to_be_modified.append(folder_selected+"/"+item)
+        self.loaded_count.configure(text=("Loaded files: "+ str(len(self.files_to_be_modified))))
+        self.convert_button.place(relx=0.5, rely=0.5, anchor='center')
+
+    def convertFiles(self):
+        for file in self.files_to_be_modified:
+            try:
+                os.mkdir(os.getcwd()+"/output")
+            except FileExistsError:
+                pass
+            new_file_lines = []
+            file_name = file.split("/")[-1]
+            file_name = file_name[0:-4]
+            opened_file = open(file,"r")
+            new_file = open("output/"+file_name+"_modified.txt","w")
+            for line in opened_file:
+                if "Lychee Web" in line:
+                    line = line.replace("Lychee Web", "Guava Net")
+                    self.replaces_done += 1
+                    self.replaces_done_count.configure(text="Replaces done: "+ str(self.replaces_done))
+                    self.menu.update()
+                new_file.write(line)
+            self.modified_files.append(new_file)
+            self.files_completed.configure(text="Files Complete: "+str(len(self.modified_files)))
+            self.menu.update()
+            print(self.modified_files)
+            opened_file.close()
+            new_file.close()
+        pass
+    def returnFiles(self):
+        pass
+
+
 
 def createGame():
     noughts_crosses = Game()
 
 
 def nameChange():
-    pass
+    file_opener = FileOpener()
 
 
 def createMainMenu():
