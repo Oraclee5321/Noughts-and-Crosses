@@ -64,8 +64,8 @@ class Game():  # Class for the game itself
         print("Deleted")
         root.deiconify()
 
-    def mainMenu(self): # Main menu of the Game
-        self.menu_window = tk.Toplevel() # Creates new window
+    def mainMenu(self):  # Main menu of the Game
+        self.menu_window = tk.Toplevel()  # Creates new window
         self.iscomputer = tk.IntVar(None, 2)
         self.playing_computer_label = tk.Label(self.menu_window, text="Playing the Computer?")
         self.playing_computer_label.grid(row=0, column=0)
@@ -85,9 +85,9 @@ class Game():  # Class for the game itself
         self.player2_name_label.grid(row=2, column=0)
         self.continue_button = ttk.Button(self.menu_window, text="Play", command=lambda: self.checkEntries())
         self.continue_button.grid(row=3, column=1)
-        root.withdraw()
+        root.withdraw()  # Hides initial menu
 
-    def editPlayerTwo(self, edit_type):
+    def editPlayerTwo(self, edit_type):  # Hides player 2 entry fields if computer is selected
         if edit_type == 1:
             self.player2_name.grid_remove()
             self.player2_name_label.grid_remove()
@@ -96,17 +96,15 @@ class Game():  # Class for the game itself
             self.player2_name_label.grid()
         pass
 
-    def checkEntries(self):
+    def checkEntries(self):  # Makes sure that all players are given a name
         p1_name = self.player1_name.get()
         if len(p1_name) == 0:
             self.player1_name_label.configure(text=(self.player1_name_label.cget("text") + "Required**"))
-            return
         if self.iscomputer.get() == 2:
             p2_name = self.player2_name.get()
-            computer = False
+            computer = False  # Makes sure they are not set to computer
             if len(p2_name) == 0:
                 self.player2_name_label.configure(text=(self.player2_name_label.cget("text") + "Required**"))
-                return
             pass
         elif self.iscomputer.get() == 1:
             p2_name = "Computer"
@@ -117,25 +115,25 @@ class Game():  # Class for the game itself
         self.players.append(self.player1)
         self.players.append(self.player2)
         icons = ["X", "O"]
-        for player in self.players:
+        for player in self.players:  # Assign icons to players
             icon = random.choice(icons)
             player.setIcon(icon)
             icons.remove(icon)
-        self.menu_window.destroy()
+        self.menu_window.destroy()  # Removes menu and all children
         self.setupBoard()
 
-    def gameRestart(self):
+    def gameRestart(self):  # Resets board for another game
         self.game_window.destroy()
         self.enabled_buttons = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         self.setupBoard()
 
-    def gameClose(self):
+    def gameClose(self):  # Opens up original menu and destroys the game
         root.deiconify()
         self.game_window.destroy()
         return
 
     def setupBoard(self):
-        self.current_player = random.randint(0, 1)
+        self.current_player = random.randint(0, 1)  # Selects first player to start
         self.players[self.current_player].turn = True
         self.game_window = tk.Toplevel()
         self.game_window.geometry("300x300")
@@ -162,23 +160,23 @@ class Game():  # Class for the game itself
         self.b7.grid(row=2, column=0, sticky="news")
         self.b8.grid(row=2, column=1, sticky="news")
         self.b9.grid(row=2, column=2, sticky="news")
-        for row in range(4):
+        for row in range(4):  # Makes it so buttons fill up screen
             self.game_window.rowconfigure(row, weight=1)
         for column in range(3):
             self.game_window.columnconfigure(column, weight=1)
-        root.withdraw()
-        if self.player2.getTurn() == True:
+        root.withdraw()  # Makes sure the initial menu is hidden still
+        if self.player2.getTurn() and self.player2.isComputer:  # If computer starts first
             self.userturn.configure(text=("It is: " + self.player2.getName() + "'s Turn"))
-            self.game_window.update()
+            self.game_window.update()  # UI updates while before sleep
             time.sleep(1)
             self.computerTurn()
 
     def computerTurn(self):
         computer_choice = random.choice(self.enabled_buttons)
-        self.b = getattr(self, "b" + str(computer_choice))
-        self.b.invoke()
+        self.b = getattr(self, "b" + str(computer_choice))  # Retrieves a random button from the class
+        self.b.invoke()  # Button is clicked digitally so the command happens
 
-    def changeState(self, button):
+    def changeState(self, button):  # Disables a button once it is clicked
         try:
             button['state'] = 'disabled'
             self.enabled_buttons.remove(int(button._name[-1]))
@@ -212,12 +210,12 @@ class Game():  # Class for the game itself
                 if self.checkWin(self.player2):
                     self.player1.setLoss(self.player1.getLoss() + 1)
                     self.endGame(self.player2)
-        if self.player2.getName() == "Computer" and self.player2.turn == True:
+        if self.player2.getName() == "Computer" and self.player2.turn:  # Only way I could think of having the computer take its turn
             self.game_window.update()
             time.sleep(1)
             self.computerTurn()
 
-    def checkWin(self, player):
+    def checkWin(self, player):  # Hardcoded win conditions
         if self.b1['text'] == self.b2['text'] == self.b3['text'] == player.getIcon():
             return True
         elif self.b4['text'] == self.b5['text'] == self.b6['text'] == player.getIcon():
@@ -237,7 +235,7 @@ class Game():  # Class for the game itself
         else:
             return
 
-    def createEndButtons(self):
+    def createEndButtons(self):  # Just creates buttons at the end of a game
         self.player1.turn = False
         self.player2.turn = False
         new_game_button = ttk.Button(self.game_window, text="Play Another?", command=lambda: self.gameRestart())
@@ -246,7 +244,7 @@ class Game():  # Class for the game itself
         end_game_button.grid(row=5, column=1, sticky="news")
         return
 
-    def displayStats(self):
+    def displayStats(self):  # Displays the players stats at the end of a game
         player1_stats = tk.Label(self.game_window, text=self.player1.getName() + "'s Stats:\n Wins:" + str(
             self.player1.getScore()) + "\n Losses: " + str(self.player1.getLoss()))
         player2_stats = tk.Label(self.game_window, text=self.player2.getName() + "'s Stats:\n Wins:" + str(
@@ -270,7 +268,7 @@ class Game():  # Class for the game itself
         self.player1.turn = False
         self.player2.turn = False
         player.setScore(player.getScore() + 1)
-        for item in self.enabled_buttons:
+        for item in self.enabled_buttons:  # Disables all remaining buttons in the game
             button = self.b = getattr(self, "b" + str(item))
             button['state'] = "disabled"
         self.userturn.configure(text=("Winner is : " + player.getName()))
@@ -278,7 +276,8 @@ class Game():  # Class for the game itself
         self.createEndButtons()
         return
 
-class FileOpener():
+
+class FileOpener:
 
     def __init__(self):
         self.files_to_be_modified = []
@@ -287,18 +286,19 @@ class FileOpener():
         root.withdraw()
         self.menu = tk.Toplevel()
         self.menu.geometry("300x300")
-        self.menu.resizable = False,False
-        self.folder_button = tk.Button(self.menu,text="Select Folder", command=lambda: self.folderSelect())
+        self.menu.resizable = False, False
+        self.folder_button = tk.Button(self.menu, text="Select Folder", command=lambda: self.folderSelect())
         self.folder_button.place(relx=0.5, rely=0.3, anchor='center')
         self.loaded_count = tk.Label(self.menu, text="")
         self.loaded_count.place(relx=0.5, rely=0.4, anchor='center')
-        self.convert_button = tk.Button(self.menu,text="Convert Files",command=lambda: self.convertFiles())
+        self.convert_button = tk.Button(self.menu, text="Convert Files", command=lambda: self.convertFiles())
         self.replaces_done_count = tk.Label(self.menu, text="")
         self.replaces_done_count.place(relx=0.5, rely=0.6, anchor='center')
-        self.files_completed = tk.Label(self.menu,text="")
+        self.files_completed = tk.Label(self.menu, text="")
         self.files_completed.place(relx=0.5, rely=0.7, anchor='center')
         pass
-    def __del__(self):
+
+    def __del__(self):  # On destruction of object, the start menu reappears
         root.deiconify()
 
     def folderSelect(self):
@@ -308,39 +308,36 @@ class FileOpener():
         list_of_files = os.listdir(folder_selected)
         for item in list_of_files:
             if ".txt" in item:
-                item.replace("'","")
-                self.files_to_be_modified.append(folder_selected+"/"+item)
-        self.loaded_count.configure(text=("Loaded files: "+ str(len(self.files_to_be_modified))))
+                item.replace("'", "")
+                self.files_to_be_modified.append(folder_selected + "/" + item)
+        self.loaded_count.configure(text=("Loaded files: " + str(len(self.files_to_be_modified))))
         self.convert_button.place(relx=0.5, rely=0.5, anchor='center')
 
     def convertFiles(self):
         for file in self.files_to_be_modified:
             try:
-                os.mkdir(os.getcwd()+"/output")
+                os.mkdir(os.getcwd() + "/output")
             except FileExistsError:
                 pass
             new_file_lines = []
             file_name = file.split("/")[-1]
             file_name = file_name[0:-4]
-            opened_file = open(file,"r")
-            new_file = open("output/"+file_name+"_modified.txt","w")
+            opened_file = open(file, "r")
+            new_file = open("output/" + file_name + "_modified.txt", "w")
             for line in opened_file:
                 if "Lychee Web" in line:
                     line = line.replace("Lychee Web", "Guava Net")
                     self.replaces_done += 1
-                    self.replaces_done_count.configure(text="Replaces done: "+ str(self.replaces_done))
+                    self.replaces_done_count.configure(text="Replaces done: " + str(self.replaces_done))
                     self.menu.update()
                 new_file.write(line)
             self.modified_files.append(new_file)
-            self.files_completed.configure(text="Files Complete: "+str(len(self.modified_files)))
+            self.files_completed.configure(text="Files Complete: " + str(len(self.modified_files)))
             self.menu.update()
             print(self.modified_files)
             opened_file.close()
             new_file.close()
-        pass
-    def returnFiles(self):
-        pass
-
+        os.startfile(os.getcwd() + "/output")
 
 
 def createGame():
