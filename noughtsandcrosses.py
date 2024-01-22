@@ -162,7 +162,7 @@ class Game():  # Class for the game itself
         for column in range(3):
             self.game_window.columnconfigure(column, weight=1)
         self.root.withdraw()  # Makes sure the initial menu is hidden still
-        if self.player2.getTurn() and self.player2.isComputer:  # If computer starts first
+        if self.player2.getTurn() and self.player2.iscomputer:  # If computer starts first
             self.userturn.configure(text=("It is: " + self.player2.getName() + "'s Turn"))
             self.game_window.update()  # UI updates while before sleep
             time.sleep(1)
@@ -195,7 +195,7 @@ class Game():  # Class for the game itself
             self.userturn.configure(text=("It is: " + self.player1.getName() + "'s Turn"))
         self.turn_count += 1
         self.game_window.title(("Turn Number: " + str(self.turn_count)))
-        if self.turn_count == 9:
+        if self.turn_count > 10:
             self.tie()
             return
         elif self.turn_count >= 5:
