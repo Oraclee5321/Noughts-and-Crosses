@@ -44,27 +44,31 @@ class FileOpener:
         self.convert_button.place(relx=0.5, rely=0.5, anchor='center')
 
     def convertFiles(self):
+        # Make output directory. If exists then just pass
+        try:
+            os.mkdir(os.getcwd() + "/output")
+        except FileExistsError:
+            pass
+        # Iterate over every file in list
         for file in self.files_to_be_modified:
-            try:
-                os.mkdir(os.getcwd() + "/output")
-            except FileExistsError:
-                pass
-            new_file_lines = []
             file_name = file.split("/")[-1]
             file_name = file_name[0:-4]
             opened_file = open(file, "r")
+            # Create new file and add "_modified" to filename
             new_file = open("output/" + file_name + "_modified.txt", "w")
             for line in opened_file:
                 if "Lychee Web" in line:
                     line = line.replace("Lychee Web", "Guava Net")
+                    # Update count
                     self.replaces_done += 1
                     self.replaces_done_count.configure(text="Replaces done: " + str(self.replaces_done))
                     self.menu.update()
-                new_file.write(line)
+                new_file.write(line)  # Write each line to new file
             self.modified_files.append(new_file)
+            # Update count
             self.files_completed.configure(text="Files Complete: " + str(len(self.modified_files)))
             self.menu.update()
-            print(self.modified_files)
+            # Close files
             opened_file.close()
             new_file.close()
-        os.startfile(os.getcwd() + "/output")
+        os.startfile(os.getcwd() + "/output")  # Open output directory in file explorer
